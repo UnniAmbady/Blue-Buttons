@@ -1,7 +1,7 @@
 import streamlit as st
 
-# --- 1. Custom CSS for Global Styles (No specific colors here) ---
-# We define global styles (size, font, shadow) but leave color to the dynamic block (Section 4).
+# --- 1. Custom CSS for Global Styles and STATIC COLORS (Violet and Gray) ---
+# We define global styles and the static colors for buttons 2 and 3 here.
 st.markdown("""
 <style>
     /* Global style for all buttons */
@@ -14,50 +14,65 @@ st.markdown("""
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
         width: 100%;
         margin: 5px 0; /* Add slight vertical margin */
-        /* Ensure all buttons respond to hover */
         opacity: 1; 
     }
     .stButton > button:hover {
         opacity: 0.85;
+    }
+
+    /* --- BUTTON 2: Instructions (STATIC Violet) --- */
+    /* Using Streamlit's internal violet color approximation */
+    div[data-testid*="instructions_button"] button {
+        background-color: #7B68EE !important; /* MediumSlateBlue (approx Violet) */
+        color: white !important;
+        border: 2px solid #7B68EE !important;
+    }
+
+    /* --- BUTTON 3: ChatGPT (STATIC Gray/Grey) --- */
+    /* Using Streamlit's internal gray color approximation */
+    div[data-testid*="chatgpt_button"] button {
+        background-color: #808080 !important; /* Gray */
+        color: white !important;
+        border: 2px solid #808080 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
 # --- 2. Initialize Session State ---
-# is_speaking now controls the color state for ALL buttons.
+# is_speaking controls the color state for Button 1 only.
 if 'is_speaking' not in st.session_state:
     st.session_state.is_speaking = False
 if 'last_pressed' not in st.session_state:
-    st.session_state.last_pressed = "App Initialized"
+    st.session_state.last_pressed = "App Initialized (Toggle button is Speak/Red)"
 
 # --- 3. Define Callback Functions ---
 def toggle_speak_stop():
-    """Toggles the state, which changes the color of all buttons."""
+    """Toggles the state, which changes the color of Button 1."""
     st.session_state.is_speaking = not st.session_state.is_speaking
     if st.session_state.is_speaking:
-        st.session_state.last_pressed = "Toggled to SPEAK mode. All buttons are now RED."
+        st.session_state.last_pressed = "Toggled to SPEAK mode. Button 1 is now RED."
     else:
-        st.session_state.last_pressed = "Toggled to STOP mode. All buttons are now LIGHT GREEN."
+        st.session_state.last_pressed = "Toggled to STOP mode. Button 1 is now GREEN."
 
 def instructions_clicked():
     """Records the Instructions button press."""
-    st.session_state.last_pressed = f"Instructions button pressed. Current mode: {'SPEAK (RED)' if st.session_state.is_speaking else 'STOP (GREEN)'}."
+    st.session_state.last_pressed = "Instructions (Violet) button pressed."
 
 def chatgpt_clicked():
     """Records the ChatGPT button press."""
-    st.session_state.last_pressed = f"ChatGPT button pressed. Current mode: {'SPEAK (RED)' if st.session_state.is_speaking else 'STOP (GREEN)'}."
+    st.session_state.last_pressed = "ChatGPT (Gray) button pressed."
 
 
-# --- 4. Dynamic CSS (Applies color to ALL buttons based on state) ---
-# This block generates a new style tag on every run to dynamically change the color of all buttons.
+# --- 4. Dynamic CSS (Applies color to BUTTON 1 only based on state) ---
+# This block ensures only the toggle button switches between Red and Green.
 if st.session_state.is_speaking:
-    # State: SPEAK (Button 1 label is "Speak"), Color: RED/White (for all buttons)
+    # State: SPEAK (Button 1 label is "Speak"), Color: RED/White
     button1_label = "Speak"
     dynamic_css = """
         <style>
-        /* Target ALL Streamlit buttons by their shared class attribute */
-        div[data-testid*="stButton"] button {
+        /* Target BUTTON 1 ONLY for the dynamic RED color */
+        div[data-testid*="speak_stop_button"] button {
             background-color: #EF4444 !important; /* RED */
             color: white !important;
             border: 2px solid #EF4444 !important;
@@ -65,15 +80,15 @@ if st.session_state.is_speaking:
         </style>
     """
 else:
-    # State: STOP (Button 1 label is "Stop"), Color: Light Green/Black (for all buttons)
+    # State: STOP (Button 1 label is "Stop"), Color: GREEN/Black
     button1_label = "Stop"
     dynamic_css = """
         <style>
-        /* Target ALL Streamlit buttons by their shared class attribute */
-        div[data-testid*="stButton"] button {
-            background-color: #A7F3D0 !important; /* LIGHT GREEN */
+        /* Target BUTTON 1 ONLY for the dynamic GREEN color */
+        div[data-testid*="speak_stop_button"] button {
+            background-color: #10B981 !important; /* GREEN */
             color: black !important;
-            border: 2px solid #A7F3D0 !important;
+            border: 2px solid #10B981 !important;
         }
         </style>
     """
@@ -81,11 +96,11 @@ st.markdown(dynamic_css, unsafe_allow_html=True)
 
 
 # --- 5. Application Layout ---
-st.title("Custom Streamlit Button Layout")
-st.markdown("All buttons switch between **RED** (Speak) and **LIGHT GREEN** (Stop) states.")
+st.title("Custom Streamlit Button Layout (4 Colors)")
+st.markdown("Button 1 toggles between **RED** (Speak) and **GREEN** (Stop). Buttons 2 & 3 are **Violet** and **Gray**.")
 
-# --- ROW 1: Toggle Button ---
-st.header("Row 1: Toggle Button")
+# --- ROW 1: Toggle Button (Red/Green) ---
+st.header("Row 1: Toggle Button (Red/Green)")
 st.button(
     button1_label,
     on_click=toggle_speak_stop,
@@ -93,8 +108,8 @@ st.button(
     use_container_width=True,
 )
 
-# --- ROW 2: Side-by-Side Buttons ---
-st.header("Row 2: Side-by-Side Buttons")
+# --- ROW 2: Side-by-Side Buttons (Violet/Gray) ---
+st.header("Row 2: Static Buttons (Violet/Gray)")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -118,12 +133,10 @@ with col2:
 st.markdown("---")
 st.subheader("Button Status (Proof of Functionality)")
 
-if st.session_state.is_speaking:
-    st.success(f"Current Global Color Mode: **RED (Speak)**")
-else:
-    st.warning(f"Current Global Color Mode: **LIGHT GREEN (Stop)**")
+toggle_color = "RED (Speak)" if st.session_state.is_speaking else "GREEN (Stop)"
+st.info(f"Button 1 Status: **{toggle_color}**")
 
-st.info(f"Last Action: **{st.session_state.last_pressed}**")
+st.success(f"Last Action: **{st.session_state.last_pressed}**")
 
 st.markdown("---")
-st.caption("Press the toggle button to change the color of all three buttons.")
+st.caption("Press any button to update the 'Last Action' status.")
