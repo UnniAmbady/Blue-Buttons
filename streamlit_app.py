@@ -1,11 +1,10 @@
 import streamlit as st
 
 # --- 1. Custom CSS for Styling (Static Colors) ---
-# We make the CSS for buttons 2 and 3 more specific (using their keys) 
-# to prevent the dynamic CSS from overriding them.
+# We use key-based selectors (data-testid) for maximum specificity and reliability.
 st.markdown("""
 <style>
-    /* Global style for all custom buttons */
+    /* Global style for all buttons */
     .stButton > button {
         height: 3.5em; /* Taller button */
         font-size: 16px;
@@ -13,33 +12,30 @@ st.markdown("""
         border-radius: 8px;
         transition: all 0.2s ease-in-out;
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin: 5px 0; /* Add slight vertical margin */
     }
 
     /* --- BUTTON 2: Instructions (Dark Blue) --- */
-    /* We use the button's unique key container: st-emotion-cache-[hash]-Instructions-button */
-    /* Target the container of the Instructions button using its key */
-    [data-testid="stFormSubmitButton"] + div > button, 
-    div[data-testid*="Instructions-button"] button {
+    /* Target button with key="instructions_button" */
+    div[data-testid*="instructions_button"] button {
         background-color: #1D4ED8 !important; /* Dark Blue */
         color: white !important;
         border: 2px solid #1D4ED8 !important;
-        width: 100%;
     }
 
     /* --- BUTTON 3: ChatGPT (Dark Purple) --- */
-    /* Target the container of the ChatGPT button using its key */
-    [data-testid="stFormSubmitButton"] + div + div > button,
+    /* Target button with key="chatgpt_button" */
     div[data-testid*="chatgpt_button"] button {
         background-color: #7E22CE !important; /* Dark Purple */
         color: white !important;
         border: 2px solid #7E22CE !important;
-        width: 100%;
     }
 
     /* Ensure buttons 2 & 3 retain their color on hover/focus */
-    div[data-testid*="Instructions-button"] button:hover,
+    div[data-testid*="instructions_button"] button:hover,
     div[data-testid*="chatgpt_button"] button:hover {
-        opacity: 0.9;
+        opacity: 0.85;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -71,7 +67,6 @@ def chatgpt_clicked():
 
 # --- 4. Dynamic CSS for Button 1 (Toggle) ---
 # This block generates a new style tag on every run to dynamically change the first button's color.
-# We now use the unique data-testid to target this button explicitly, making the CSS highly specific.
 if st.session_state.is_speaking:
     # State: STOP (Button label is "Stop"), Color: Light Green/Black
     button1_label = "Stop"
@@ -112,8 +107,6 @@ st.button(
     on_click=toggle_speak_stop,
     key="speak_stop_button",
     use_container_width=True,
-    # Setting type="primary" to give it a distinct CSS anchor
-    type="primary"
 )
 
 # --- ROW 2: Side-by-Side Buttons ---
@@ -126,7 +119,6 @@ with col1:
         on_click=instructions_clicked,
         key="instructions_button",
         use_container_width=True,
-        type="secondary" # Used to distinguish from the primary button type
     )
 
 with col2:
@@ -135,7 +127,6 @@ with col2:
         on_click=chatgpt_clicked,
         key="chatgpt_button",
         use_container_width=True,
-        type="secondary" # Used to distinguish from the primary button type
     )
 
 
