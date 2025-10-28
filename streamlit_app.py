@@ -1,9 +1,8 @@
 import streamlit as st
 
-# --- 1. Custom CSS for Styling ---
-# WARNING: We use Streamlit's internal CSS classes (like .stButton) and :nth-of-type() selectors
-# to target and style the buttons based on their order of appearance on the page.
-# This approach is necessary for custom colors, but relies on Streamlit's current DOM structure.
+# --- 1. Custom CSS for Styling (Static Colors) ---
+# We make the CSS for buttons 2 and 3 more specific (using their keys) 
+# to prevent the dynamic CSS from overriding them.
 st.markdown("""
 <style>
     /* Global style for all custom buttons */
@@ -17,8 +16,10 @@ st.markdown("""
     }
 
     /* --- BUTTON 2: Instructions (Dark Blue) --- */
-    /* Target the second stButton on the page */
-    .stButton:nth-of-type(2) > button {
+    /* We use the button's unique key container: st-emotion-cache-[hash]-Instructions-button */
+    /* Target the container of the Instructions button using its key */
+    [data-testid="stFormSubmitButton"] + div > button, 
+    div[data-testid*="Instructions-button"] button {
         background-color: #1D4ED8 !important; /* Dark Blue */
         color: white !important;
         border: 2px solid #1D4ED8 !important;
@@ -26,12 +27,19 @@ st.markdown("""
     }
 
     /* --- BUTTON 3: ChatGPT (Dark Purple) --- */
-    /* Target the third stButton on the page */
-    .stButton:nth-of-type(3) > button {
+    /* Target the container of the ChatGPT button using its key */
+    [data-testid="stFormSubmitButton"] + div + div > button,
+    div[data-testid*="chatgpt_button"] button {
         background-color: #7E22CE !important; /* Dark Purple */
         color: white !important;
         border: 2px solid #7E22CE !important;
         width: 100%;
+    }
+
+    /* Ensure buttons 2 & 3 retain their color on hover/focus */
+    div[data-testid*="Instructions-button"] button:hover,
+    div[data-testid*="chatgpt_button"] button:hover {
+        opacity: 0.9;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -63,13 +71,14 @@ def chatgpt_clicked():
 
 # --- 4. Dynamic CSS for Button 1 (Toggle) ---
 # This block generates a new style tag on every run to dynamically change the first button's color.
+# We now use the unique data-testid to target this button explicitly, making the CSS highly specific.
 if st.session_state.is_speaking:
     # State: STOP (Button label is "Stop"), Color: Light Green/Black
     button1_label = "Stop"
     button1_css = """
         <style>
-        /* Target the first stButton on the page */
-        .stButton:nth-of-type(1) > button {
+        /* Target the Speak/Stop button using its unique key test ID */
+        div[data-testid*="speak_stop_button"] button {
             background-color: #A7F3D0 !important; /* Light Green */
             color: black !important;
             border: 2px solid #A7F3D0 !important;
@@ -81,8 +90,8 @@ else:
     button1_label = "Speak"
     button1_css = """
         <style>
-        /* Target the first stButton on the page */
-        .stButton:nth-of-type(1) > button {
+        /* Target the Speak/Stop button using its unique key test ID */
+        div[data-testid*="speak_stop_button"] button {
             background-color: #EF4444 !important; /* Red */
             color: white !important;
             border: 2px solid #EF4444 !important;
