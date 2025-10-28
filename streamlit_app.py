@@ -1,51 +1,8 @@
 import streamlit as st
 
-# --- 1. Custom CSS for Global Styles and STATIC COLORS (Violet and Gray) ---
-# This block defines global button styling and the static colors for buttons 2 and 3.
-# We are now targeting specific data-testid AND button type for higher specificity.
-st.markdown("""
-<style>
-    /* Global style for all buttons */
-    .stButton > button {
-        height: 3.5em; /* Taller button */
-        font-size: 16px;
-        font-weight: bold;
-        border-radius: 8px;
-        transition: all 0.2s ease-in-out;
-        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        margin: 5px 0; /* Add slight vertical margin */
-        opacity: 1; 
-        /* Ensure default text color for custom buttons is white unless specified */
-        color: white !important; 
-    }
-    .stButton > button:hover {
-        opacity: 0.85;
-    }
-
-    /* --- BUTTON 2: Instructions (STATIC Violet) --- */
-    /* Target by key and specifically for 'secondary' type */
-    div[data-testid*="instructions_button"] button[data-testid="stButton-secondary"] {
-        background-color: #7B68EE !important; /* MediumSlateBlue (approx Violet) */
-        border: 2px solid #7B68EE !important;
-        color: white !important;
-    }
-
-    /* --- BUTTON 3: ChatGPT (STATIC Gray/Grey) --- */
-    /* Target by key and specifically for 'secondary' type */
-    div[data-testid*="chatgpt_button"] button[data-testid="stButton-secondary"] {
-        background-color: #808080 !important; /* Gray */
-        border: 2px solid #808080 !important;
-        color: white !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-
-# --- 2. Initialize Session State ---
-# is_speaking controls the color state for Button 1 only.
+# --- 2. Initialize Session State (Set to SPEAK/RED state on first run) ---
 if 'is_speaking' not in st.session_state:
-    st.session_state.is_speaking = False
+    st.session_state.is_speaking = True # Start in SPEAK (RED) mode
 if 'last_pressed' not in st.session_state:
     st.session_state.last_pressed = "App Initialized (Toggle button is Speak/Red)"
 
@@ -67,36 +24,67 @@ def chatgpt_clicked():
     st.session_state.last_pressed = "ChatGPT (Gray) button pressed."
 
 
-# --- 4. Dynamic CSS (Applies color to BUTTON 1 only based on state) ---
-# This block ensures only the toggle button switches between Red and Green.
-# We are now targeting specific data-testid AND button type for higher specificity.
+# --- 4. Dynamic/Static CSS Injection (Combined into one block for consistency) ---
 if st.session_state.is_speaking:
     # State: SPEAK (Button 1 label is "Speak"), Color: RED/White
     button1_label = "Speak"
-    dynamic_css = """
-        <style>
+    dynamic_toggle_style = """
         /* Target BUTTON 1 ONLY for the dynamic RED color, using its primary type */
         div[data-testid*="speak_stop_button"] button[data-testid="stButton-primary"] {
             background-color: #EF4444 !important; /* RED */
             color: white !important;
             border: 2px solid #EF4444 !important;
         }
-        </style>
     """
 else:
     # State: STOP (Button 1 label is "Stop"), Color: GREEN/Black
     button1_label = "Stop"
-    dynamic_css = """
-        <style>
+    dynamic_toggle_style = """
         /* Target BUTTON 1 ONLY for the dynamic GREEN color, using its primary type */
         div[data-testid*="speak_stop_button"] button[data-testid="stButton-primary"] {
             background-color: #10B981 !important; /* GREEN */
             color: black !important; /* Black text for green button */
             border: 2px solid #10B981 !important;
         }
-        </style>
     """
-st.markdown(dynamic_css, unsafe_allow_html=True)
+
+# Combine Global, Static, and Dynamic CSS into one style block for consistent rendering
+full_css = f"""
+<style>
+    /* Global style for all buttons */
+    .stButton > button {{
+        height: 3.5em; 
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin: 5px 0;
+        opacity: 1; 
+    }}
+    .stButton > button:hover {{
+        opacity: 0.85;
+    }}
+
+    /* --- BUTTON 2: Instructions (STATIC Violet) --- */
+    div[data-testid*="instructions_button"] button[data-testid="stButton-secondary"] {{
+        background-color: #7B68EE !important; /* MediumSlateBlue (approx Violet) */
+        border: 2px solid #7B68EE !important;
+        color: white !important; /* Explicitly set white text */
+    }}
+
+    /* --- BUTTON 3: ChatGPT (STATIC Gray/Grey) --- */
+    div[data-testid*="chatgpt_button"] button[data-testid="stButton-secondary"] {{
+        background-color: #808080 !important; /* Gray */
+        border: 2px solid #808080 !important;
+        color: white !important; /* Explicitly set white text */
+    }}
+
+    {dynamic_toggle_style}
+</style>
+"""
+st.markdown(full_css, unsafe_allow_html=True)
 
 
 # --- 5. Application Layout ---
