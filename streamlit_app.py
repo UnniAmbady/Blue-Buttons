@@ -1,7 +1,8 @@
 import streamlit as st
 
 # --- 1. Custom CSS for Global Styles and STATIC COLORS (Violet and Gray) ---
-# We define global styles and the static colors for buttons 2 and 3 here.
+# This block defines global button styling and the static colors for buttons 2 and 3.
+# We are now targeting specific data-testid AND button type for higher specificity.
 st.markdown("""
 <style>
     /* Global style for all buttons */
@@ -15,25 +16,27 @@ st.markdown("""
         width: 100%;
         margin: 5px 0; /* Add slight vertical margin */
         opacity: 1; 
+        /* Ensure default text color for custom buttons is white unless specified */
+        color: white !important; 
     }
     .stButton > button:hover {
         opacity: 0.85;
     }
 
     /* --- BUTTON 2: Instructions (STATIC Violet) --- */
-    /* Using Streamlit's internal violet color approximation */
-    div[data-testid*="instructions_button"] button {
+    /* Target by key and specifically for 'secondary' type */
+    div[data-testid*="instructions_button"] button[data-testid="stButton-secondary"] {
         background-color: #7B68EE !important; /* MediumSlateBlue (approx Violet) */
-        color: white !important;
         border: 2px solid #7B68EE !important;
+        color: white !important;
     }
 
     /* --- BUTTON 3: ChatGPT (STATIC Gray/Grey) --- */
-    /* Using Streamlit's internal gray color approximation */
-    div[data-testid*="chatgpt_button"] button {
+    /* Target by key and specifically for 'secondary' type */
+    div[data-testid*="chatgpt_button"] button[data-testid="stButton-secondary"] {
         background-color: #808080 !important; /* Gray */
-        color: white !important;
         border: 2px solid #808080 !important;
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -66,13 +69,14 @@ def chatgpt_clicked():
 
 # --- 4. Dynamic CSS (Applies color to BUTTON 1 only based on state) ---
 # This block ensures only the toggle button switches between Red and Green.
+# We are now targeting specific data-testid AND button type for higher specificity.
 if st.session_state.is_speaking:
     # State: SPEAK (Button 1 label is "Speak"), Color: RED/White
     button1_label = "Speak"
     dynamic_css = """
         <style>
-        /* Target BUTTON 1 ONLY for the dynamic RED color */
-        div[data-testid*="speak_stop_button"] button {
+        /* Target BUTTON 1 ONLY for the dynamic RED color, using its primary type */
+        div[data-testid*="speak_stop_button"] button[data-testid="stButton-primary"] {
             background-color: #EF4444 !important; /* RED */
             color: white !important;
             border: 2px solid #EF4444 !important;
@@ -84,10 +88,10 @@ else:
     button1_label = "Stop"
     dynamic_css = """
         <style>
-        /* Target BUTTON 1 ONLY for the dynamic GREEN color */
-        div[data-testid*="speak_stop_button"] button {
+        /* Target BUTTON 1 ONLY for the dynamic GREEN color, using its primary type */
+        div[data-testid*="speak_stop_button"] button[data-testid="stButton-primary"] {
             background-color: #10B981 !important; /* GREEN */
-            color: black !important;
+            color: black !important; /* Black text for green button */
             border: 2px solid #10B981 !important;
         }
         </style>
@@ -106,6 +110,7 @@ st.button(
     on_click=toggle_speak_stop,
     key="speak_stop_button",
     use_container_width=True,
+    type="primary", # This button will be primary
 )
 
 # --- ROW 2: Side-by-Side Buttons (Violet/Gray) ---
@@ -118,6 +123,7 @@ with col1:
         on_click=instructions_clicked,
         key="instructions_button",
         use_container_width=True,
+        type="secondary", # This button will be secondary
     )
 
 with col2:
@@ -126,6 +132,7 @@ with col2:
         on_click=chatgpt_clicked,
         key="chatgpt_button",
         use_container_width=True,
+        type="secondary", # This button will be secondary
     )
 
 
